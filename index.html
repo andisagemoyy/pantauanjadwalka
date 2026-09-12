@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07182c">
+  <meta name="description" content="Pantauan otomatis jadwal KA datang dan berangkat Stasiun Jakarta Kota berdasarkan jam perangkat.">
+  <title>Pantauan Jadwal KA JAKK</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307182c'/%3E%3Cpath d='M9 5v22M23 5v22M9 10h14M9 16h14M9 22h14' stroke='%23fff' stroke-width='2.4'/%3E%3Cpath d='m20 5 7 6' stroke='%23f36f21' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="schedule-data.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body data-mode="arrival">
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <img class="kai-logo" src="assets/kai-logo.png" width="138" height="37" alt="KAI">
+        <span class="brand-divider" aria-hidden="true"></span>
+        <div>
+          <p class="eyebrow">STASIUN JAKARTA KOTA</p>
+          <h1>Pantauan Jadwal KA</h1>
+        </div>
+      </div>
+
+      <div class="device-time" aria-label="Waktu perangkat saat ini">
+        <span class="time-label">JAM PERANGKAT</span>
+        <time id="live-clock" class="live-clock">--:--:--</time>
+        <span id="live-date" class="live-date">Memuat tanggal…</span>
+      </div>
+    </header>
+
+    <main class="monitor" aria-label="Pantauan jadwal kereta Jakarta Kota">
+      <nav class="mode-tabs" role="tablist" aria-label="Pilih jenis jadwal">
+        <button id="tab-arrival" class="mode-tab arrival-tab" type="button" role="tab" aria-selected="true" aria-controls="slide-arrival" data-target="arrival">
+          <span class="mode-dot" aria-hidden="true"></span>
+          <span>KA DATANG</span>
+        </button>
+        <button id="tab-departure" class="mode-tab departure-tab" type="button" role="tab" aria-selected="false" aria-controls="slide-departure" data-target="departure" tabindex="-1">
+          <span class="mode-dot" aria-hidden="true"></span>
+          <span>KA BERANGKAT</span>
+        </button>
+      </nav>
+
+      <div id="slides" class="slides" aria-live="off">
+        <div id="slides-track" class="slides-track">
+          <section id="slide-arrival" class="schedule-slide arrival-slide" role="tabpanel" aria-labelledby="tab-arrival">
+            <div class="panel-heading">
+              <div>
+                <p class="panel-kicker">PANTAUAN TERDEKAT</p>
+                <h2>Kereta Datang</h2>
+              </div>
+              <div class="signal arrival-signal" aria-label="Penanda datang berwarna merah"><span></span>DATANG</div>
+            </div>
+            <div class="schedule-toolbar">
+              <form id="arrival-search-form" class="schedule-tools" role="search">
+                <label class="search-box" for="arrival-search">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                  <span class="sr-only">Cari nomor KA datang</span>
+                  <input id="arrival-search" type="search" list="arrival-suggestions" inputmode="search" autocomplete="off" spellcheck="false" placeholder="Cari nomor KA, contoh 1350" aria-describedby="arrival-search-feedback">
+                  <datalist id="arrival-suggestions"></datalist>
+                </label>
+                <button class="tool-button search-button" type="submit">Cari</button>
+                <button id="arrival-refresh" class="tool-button refresh-button" type="button" title="Kembali ke jadwal saat ini">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6v5h-5"></path><path d="M19 11a7.5 7.5 0 1 0 .2 4"></path></svg>
+                  <span>Refresh</span>
+                </button>
+              </form>
+              <p id="arrival-search-feedback" class="search-feedback" aria-live="polite"></p>
+            </div>
+            <div class="column-headings" aria-hidden="true"><span>NOMOR KA</span><span>JAM DATANG</span></div>
+            <ol id="arrival-list" class="schedule-list" tabindex="0" aria-label="Seluruh jadwal kereta datang; 10 baris terlihat dan daftar dapat digulir"></ol>
+          </section>
+
+          <section id="slide-departure" class="schedule-slide departure-slide" role="tabpanel" aria-labelledby="tab-departure" aria-hidden="true">
+            <div class="panel-heading">
+              <div>
+                <p class="panel-kicker">PANTAUAN TERDEKAT</p>
+                <h2>Kereta Berangkat</h2>
+              </div>
+              <div class="signal departure-signal" aria-label="Penanda berangkat berwarna hijau"><span></span>BERANGKAT</div>
+            </div>
+            <div class="schedule-toolbar">
+              <form id="departure-search-form" class="schedule-tools" role="search">
+                <label class="search-box" for="departure-search">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                  <span class="sr-only">Cari nomor KA berangkat</span>
+                  <input id="departure-search" type="search" list="departure-suggestions" inputmode="search" autocomplete="off" spellcheck="false" placeholder="Cari nomor KA, contoh 1350" aria-describedby="departure-search-feedback">
+                  <datalist id="departure-suggestions"></datalist>
+                </label>
+                <button class="tool-button search-button" type="submit">Cari</button>
+                <button id="departure-refresh" class="tool-button refresh-button" type="button" title="Kembali ke jadwal saat ini">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6v5h-5"></path><path d="M19 11a7.5 7.5 0 1 0 .2 4"></path></svg>
+                  <span>Refresh</span>
+                </button>
+              </form>
+              <p id="departure-search-feedback" class="search-feedback" aria-live="polite"></p>
+            </div>
+            <div class="column-headings" aria-hidden="true"><span>NOMOR KA</span><span>JAM BERANGKAT</span></div>
+            <ol id="departure-list" class="schedule-list" tabindex="0" aria-label="Seluruh jadwal kereta berangkat; 10 baris terlihat dan daftar dapat digulir"></ol>
+          </section>
+        </div>
+      </div>
+
+      <div class="slide-controls" aria-label="Kontrol slide">
+        <button id="previous-slide" class="slide-arrow" type="button" aria-label="Tampilkan slide sebelumnya">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+        </button>
+        <div class="slide-dots" aria-hidden="true"><span class="active"></span><span></span></div>
+        <button id="next-slide" class="slide-arrow" type="button" aria-label="Tampilkan slide berikutnya">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </button>
+      </div>
+    </main>
+
+    <footer class="footer-bar">
+      <span>GAPEKA berlaku mulai 1 Februari 2025</span>
+      <span class="footer-separator" aria-hidden="true"></span>
+      <span>Gulir untuk melihat jadwal lain • Refresh untuk kembali ke waktu sekarang</span>
+    </footer>
+  </div>
+
+  <p id="status-announcement" class="sr-only" aria-live="assertive"></p>
+  <noscript><div class="noscript">Aktifkan JavaScript agar jadwal dapat mengikuti jam perangkat.</div></noscript>
+</body>
+</html>
